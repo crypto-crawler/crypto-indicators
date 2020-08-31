@@ -275,6 +275,7 @@ export async function crawlFundingRates(market: Market): Promise<void> {
           ].fundingTime,
         ).getTime() + 1000;
 
+  // eslint-disable-next-line no-shadow
   let crawlFunc: (market: Market, startTime: number) => Promise<readonly FundingRate[]>;
   switch (market.exchange) {
     case 'Binance':

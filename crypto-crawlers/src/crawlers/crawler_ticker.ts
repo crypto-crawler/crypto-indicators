@@ -1,9 +1,10 @@
 import { strict as assert } from 'assert';
 import crawl, { TickerMsg } from 'crypto-crawler';
-import { MarketType, MARKET_TYPES } from 'crypto-markets';
+import fetchMarkets, { MarketType, MARKET_TYPES } from 'crypto-markets';
+import * as kafka from 'kafka-node';
 import yargs from 'yargs';
 import { createLogger, Heartbeat, Publisher } from '../utils';
-import { calcRedisTopic } from './common';
+import { calcRedisTopic, KAFKA_TICKER_TOPIC } from './common';
 
 const EXCHANGE_THRESHOLD: { [key: string]: number } = {
   BitMEX: 900,
@@ -28,6 +29,13 @@ async function crawlTicker(
   const logger = createLogger(`crawler-ticker-${exchange}-${marketType}`);
   const heartbeat = new Heartbeat(logger, EXCHANGE_THRESHOLD[exchange] || 60);
 
+  const kafkaPublisher = new kafka.HighLevelProducer(
+    new kafka.KafkaClient({
+      clientId: 'crawler_ticker',
+      kafkaHost: process.env.KAFKA_HOST || 'localhost:9092',
+    }),
+  );
+
   crawl(
     exchange,
     marketType,
@@ -39,12 +47,24 @@ async function crawlTicker(
       const tickerMsg = msg as TickerMsg;
 
       publisher.publish(calcRedisTopic(tickerMsg), tickerMsg);
+
+      const km = new kafka.KeyedMessage(
+        `${msg.exchange}-${msg.marketType}-${msg.pair}-${msg.rawPair}`,
+        JSON.stringify(tickerMsg),
+      );
+      const payloads: kafka.ProduceRequest[] = [{ topic: KAFKA_TICKER_TOPIC, messages: [km] }];
+      kafkaPublisher.send(payloads, (err, data) => {
+        if (err) {
+          logger.error(err);
+        }
+        assert.equal(KAFKA_TICKER_TOPIC, Object.keys(data)[0]);
+      });
     },
   );
 }
 
 const commandModule: yargs.CommandModule = {
-  command: 'crawler_ticker <exchange> <marketType> [pairs]',
+  command: 'crawler_ticker <exchange> <marketType>',
   describe: 'Crawl ticker',
   // eslint-disable-next-line no-shadow
   builder: (yargs) =>
@@ -58,24 +78,21 @@ const commandModule: yargs.CommandModule = {
         choices: MARKET_TYPES,
         type: 'string',
         demandOption: true,
-      })
-      .options({
-        pairs: {
-          type: 'array',
-          demandOption: true,
-        },
       }),
   handler: async (argv) => {
     const params: {
       exchange: string;
       marketType: MarketType;
-      pairs: string[];
     } = argv as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    const swapPairs = (await fetchMarkets(params.exchange, params.marketType))
+      .filter((m) => m.active)
+      .map((m) => m.pair);
+    const pairsFromEnv = (process.env.PAIRS || ' ').split(' ').filter((x) => x);
+    const pairs =
+      pairsFromEnv.length > 0 ? pairsFromEnv.filter((x) => swapPairs.includes(x)) : swapPairs;
+    assert.ok(pairs.length > 0);
 
-    assert.ok(params.pairs.length > 0);
-    assert.ok(process.env.DATA_DIR, 'Please define a DATA_DIR environment variable in .envrc');
-
-    await crawlTicker(params.exchange, params.marketType, params.pairs);
+    await crawlTicker(params.exchange, params.marketType, pairs);
   },
 };
 

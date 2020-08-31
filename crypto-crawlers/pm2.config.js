@@ -38,6 +38,20 @@ const apps = [
   },
 ];
 
+['Binance', 'Huobi', 'OKEx']
+  .flatMap((exchange) => ['Spot', 'Swap'].map((marketType) => ({ exchange, marketType })))
+  .forEach((x) => {
+    apps.push({
+      name: `crawler-ticker-${x.exchange}-${x.marketType}`,
+      script: 'dist/cli.js',
+      args: `crawler_ticker ${x.exchange} ${x.marketType}`,
+      exec_mode: 'fork',
+      instances: 1,
+      autorestart: true,
+      watch: false,
+    });
+  });
+
 module.exports = {
   apps,
 };
