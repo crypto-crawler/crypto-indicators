@@ -1,0 +1,92 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:latest
+    command: --requirepass programmer123
+    container_name: redis
+    ports:
+      - 6379:6379
+
+  zookeeper:
+    image: "bitnami/zookeeper:latest"
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    volumes:
+      - "zookeeper_data:/bitnami"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  kafka:
+    image: "bitnami/kafka:latest"
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    volumes:
+      - "kafka_data:/bitnami"
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+    depends_on:
+      - zookeeper
+
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    ports:
+      - 8086:8086
+    environment:
+      - INFLUXDB_DB=crypto_indicators
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=passw0rd
+      - INFLUXDB_HTTP_AUTH_ENABLED=true
+    volumes:
+      - "influxdb_data:/var/lib/influxdb"
+
+  telegraf:
+    image: telegraf:latest
+    container_name: telegraf
+    command: telegraf --config /etc/telegraf/telegraf.conf --config-directory /etc/telegraf/telegraf.d
+    volumes:
+      - "./configs/telegraf:/etc/telegraf:ro"
+    depends_on:
+      - influxdb
+      - kafka
+    restart: always
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=passw0rd
+    volumes:
+      - "grafana_data:/var/lib/grafana"
+      - "./configs/grafana/provisioning:/etc/grafana/provisioning:ro"
+    depends_on:
+      - influxdb
+
+  crawlers:
+    build:
+      context: ./crypto-crawlers
+    image: crypto-crawlers:latest
+    container_name: crypto-crawlers
+    environment:
+      - REDIS_URL=redis://xxx:programmer123@redis:6379
+      - KAFKA_HOST=kafka:9092
+    depends_on:
+      - kafka
+
+volumes:
+  influxdb_data:
+    driver: local
+  grafana_data:
+    driver: local
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
