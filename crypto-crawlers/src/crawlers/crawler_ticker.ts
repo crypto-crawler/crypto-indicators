@@ -1,10 +1,10 @@
 import { strict as assert } from 'assert';
 import crawl, { TickerMsg } from 'crypto-crawler';
-import fetchMarkets, { MarketType, MARKET_TYPES } from 'crypto-markets';
+import { MarketType, MARKET_TYPES } from 'crypto-markets';
 import * as kafka from 'kafka-node';
 import yargs from 'yargs';
 import { createLogger, Heartbeat, Publisher } from '../utils';
-import { calcRedisTopic, KAFKA_TICKER_TOPIC } from './common';
+import { calcPairs, calcRedisTopic, KAFKA_TICKER_TOPIC } from './common';
 
 const EXCHANGE_THRESHOLD: { [key: string]: number } = {
   BitMEX: 900,
@@ -56,8 +56,9 @@ async function crawlTicker(
       kafkaPublisher.send(payloads, (err, data) => {
         if (err) {
           logger.error(err);
+        } else {
+          assert.equal(KAFKA_TICKER_TOPIC, Object.keys(data)[0]);
         }
-        assert.equal(KAFKA_TICKER_TOPIC, Object.keys(data)[0]);
       });
     },
   );
@@ -84,12 +85,8 @@ const commandModule: yargs.CommandModule = {
       exchange: string;
       marketType: MarketType;
     } = argv as any; // eslint-disable-line @typescript-eslint/no-explicit-any
-    const swapPairs = (await fetchMarkets(params.exchange, params.marketType))
-      .filter((m) => m.active)
-      .map((m) => m.pair);
-    const pairsFromEnv = (process.env.PAIRS || ' ').split(' ').filter((x) => x);
-    const pairs =
-      pairsFromEnv.length > 0 ? pairsFromEnv.filter((x) => swapPairs.includes(x)) : swapPairs;
+
+    const pairs = await calcPairs(params.exchange, params.marketType);
     assert.ok(pairs.length > 0);
 
     await crawlTicker(params.exchange, params.marketType, pairs);

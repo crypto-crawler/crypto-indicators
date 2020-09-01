@@ -52,6 +52,26 @@ const apps = [
     });
   });
 
+[
+  { exchange: 'Binance', marketType: 'Spot' },
+  { exchange: 'Binance', marketType: 'Swap' },
+  { exchange: 'BitMEX', marketType: 'Swap' },
+  { exchange: 'Huobi', marketType: 'Spot' },
+  { exchange: 'Huobi', marketType: 'Swap' },
+  { exchange: 'OKEx', marketType: 'Spot' },
+  { exchange: 'OKEx', marketType: 'Swap' },
+].forEach((x) => {
+  apps.push({
+    name: `crawler-kline-${x.exchange}-${x.marketType}`,
+    script: 'dist/cli.js',
+    args: `crawler_kline ${x.exchange} ${x.marketType}`,
+    exec_mode: 'fork',
+    instances: 1,
+    autorestart: true,
+    watch: false,
+  });
+});
+
 module.exports = {
   apps,
 };

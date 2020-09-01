@@ -74,8 +74,9 @@ const commandModule: yargs.CommandModule = {
         publisher.send(payloads, (err, data) => {
           if (err) {
             logger.error(err);
+          } else {
+            assert.equal(KAFKA_OKEx_FUNDING_RATE_TOPIC, Object.keys(data)[0]);
           }
-          assert.equal(KAFKA_OKEx_FUNDING_RATE_TOPIC, Object.keys(data)[0]);
         });
       },
     );

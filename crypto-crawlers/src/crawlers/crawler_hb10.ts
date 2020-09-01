@@ -34,8 +34,9 @@ const commandModule: yargs.CommandModule = {
         publisher.send(payloads, (err, data) => {
           if (err) {
             logger.error(err);
+          } else {
+            assert.equal(KAFKA_HB10_TOPIC, Object.keys(data)[0]);
           }
-          assert.equal(KAFKA_HB10_TOPIC, Object.keys(data)[0]);
         });
       },
     );

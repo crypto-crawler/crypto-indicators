@@ -354,10 +354,11 @@ export async function crawlFundingRates(market: Market): Promise<void> {
   publisher.send(payloads, (err, data) => {
     if (err) {
       console.error(err);
+    } else {
+      assert.equal(KAFKA_FUNDING_RATE_TOPIC, Object.keys(data)[0]);
+      fs.writeFileSync(fundingRatesFile, `${JSON.stringify(allFundingRates, null, 2)}\n`);
     }
-    assert.equal(KAFKA_FUNDING_RATE_TOPIC, Object.keys(data)[0]);
 
-    fs.writeFileSync(fundingRatesFile, `${JSON.stringify(allFundingRates, null, 2)}\n`);
     publisher.close();
   });
 }
