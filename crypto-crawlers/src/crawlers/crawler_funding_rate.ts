@@ -308,30 +308,10 @@ export async function crawlFundingRates(market: Market): Promise<void> {
     }
   }
 
-  // special handling logic of OKEx
-  if (fundingRatesHistory.length > 0 && market.exchange === 'OKEx') {
-    const cur1 = fundingRatesHistory[fundingRatesHistory.length - 1];
-    const cur2 = fundingRates[0];
-    if (cur1.fundingTime === cur2.fundingTime) {
-      assert.equal(cur1.fundingRate, cur2.fundingRate);
-      fundingRates = fundingRates.slice(1, fundingRates.length);
-    }
-  }
-
-  // check duplication
-  fundingRates.forEach((x) => {
-    const found = fundingRatesHistory.find(
-      (y) =>
-        y.exchange === x.exchange && y.rawPair === x.rawPair && y.fundingTime === x.fundingTime,
-    );
-    if (found !== undefined) {
-      console.error(x);
-      console.error(fundingRates);
-      throw new Error('Duplicated item found');
-    }
-  });
-
-  const allFundingRates = _.sortedUniqBy(fundingRatesHistory.concat(fundingRates), 'fundingTime');
+  const allFundingRates = _.sortBy(
+    _.uniqBy(fundingRatesHistory.concat(fundingRates), 'fundingTime'),
+    'fundingTime',
+  );
 
   // write to Kafka incrementally
   const publisher = new kafka.HighLevelProducer(
