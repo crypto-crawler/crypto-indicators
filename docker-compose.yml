@@ -29,6 +29,8 @@ services:
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_CFG_LOG_RETENTION_HOURS=1
+      - KAFKA_CFG_RETENTION_HOURS=1
     depends_on:
       - zookeeper
     restart: always
@@ -43,6 +45,7 @@ services:
       - INFLUXDB_ADMIN_USER=admin
       - INFLUXDB_ADMIN_PASSWORD=passw0rd
       - INFLUXDB_HTTP_AUTH_ENABLED=true
+      - INFLUXDB_HTTP_FLUX_ENABLED=true
     volumes:
       - "influxdb_data:/var/lib/influxdb"
 
@@ -81,6 +84,7 @@ services:
       - KAFKA_HOST=kafka:9092
     depends_on:
       - kafka
+    restart: always
 
 volumes:
   influxdb_data:
