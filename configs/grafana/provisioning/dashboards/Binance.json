@@ -209,6 +209,8 @@
           "measurement": "funding_rate",
           "orderByTime": "ASC",
           "policy": "default",
+          "query": "SELECT mean(\"fundingRate\") FROM \"funding_rate\" WHERE (\"exchange\" = 'Binance') AND $timeFilter GROUP BY time(1h), \"pair\" fill(previous)",
+          "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -283,7 +285,7 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-12h",
     "to": "now"
   },
   "timepicker": {},

@@ -15,7 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 3,
   "links": [],
   "panels": [
     {
@@ -66,28 +66,33 @@
           "groupBy": [
             {
               "params": [
-                "$__interval"
+                "15m"
               ],
               "type": "time"
             },
             {
               "params": [
-                "null"
+                "pair"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "linear"
               ],
               "type": "fill"
             }
           ],
+          "measurement": "okex_funding_rate",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT mean(\"fundingRate\") FROM \"funding_rate\" WHERE (\"exchange\" = 'Huobi') AND $timeFilter GROUP BY time(1h), \"pair\" fill(previous)",
-          "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
             [
               {
                 "params": [
-                  "value"
+                  "estimatedRate"
                 ],
                 "type": "field"
               },
@@ -97,14 +102,20 @@
               }
             ]
           ],
-          "tags": []
+          "tags": [
+            {
+              "key": "exchange",
+              "operator": "=",
+              "value": "OKEx"
+            }
+          ]
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Funding Rates",
+      "title": "Estimated Funding Rates",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -189,7 +200,7 @@
           "groupBy": [
             {
               "params": [
-                "1m"
+                "15m"
               ],
               "type": "time"
             },
@@ -201,42 +212,21 @@
             },
             {
               "params": [
-                "linear"
+                "previous"
               ],
               "type": "fill"
             }
           ],
-          "hide": false,
-          "measurement": "ticker",
+          "measurement": "okex_funding_rate",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT mean(\"close\")  / mean(\"open\") -1 FROM \"ticker\" WHERE (\"exchange\" = 'Huobi' AND \"marketType\" = 'Swap') AND $timeFilter GROUP BY time(5m), \"pair\" fill(linear)",
-          "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
             [
               {
                 "params": [
-                  "close"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              },
-              {
-                "params": [
-                  " / 100"
-                ],
-                "type": "math"
-              }
-            ],
-            [
-              {
-                "params": [
-                  "open"
+                  "fundingRate"
                 ],
                 "type": "field"
               },
@@ -250,13 +240,7 @@
             {
               "key": "exchange",
               "operator": "=",
-              "value": "Huobi"
-            },
-            {
-              "condition": "AND",
-              "key": "marketType",
-              "operator": "=",
-              "value": "Swap"
+              "value": "OKEx"
             }
           ]
         }
@@ -265,7 +249,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Price Change Percent",
+      "title": "Funding Rates",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -350,27 +334,28 @@
           "groupBy": [
             {
               "params": [
-                "1m"
+                "$__interval"
               ],
               "type": "time"
             },
             {
               "params": [
-                "linear"
+                "null"
               ],
               "type": "fill"
             }
           ],
-          "measurement": "hb10",
           "orderByTime": "ASC",
           "policy": "default",
+          "query": "SELECT mean(\"close\")  / mean(\"open\") -1 FROM \"ticker\" WHERE (\"exchange\" = 'OKEx' AND \"marketType\" = 'Swap') AND $timeFilter GROUP BY time(5m), \"pair\" fill(linear)",
+          "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
             [
               {
                 "params": [
-                  "close"
+                  "value"
                 ],
                 "type": "field"
               },
@@ -380,20 +365,14 @@
               }
             ]
           ],
-          "tags": [
-            {
-              "key": "interval",
-              "operator": "=",
-              "value": "1m"
-            }
-          ]
+          "tags": []
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "HB10 Index",
+      "title": "Price Change Percent",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -431,7 +410,6 @@
       }
     }
   ],
-  "refresh": "10s",
   "schemaVersion": 26,
   "style": "dark",
   "tags": [],
@@ -444,7 +422,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Huobi",
-  "uid": "Yzf3pMDMz",
-  "version": 1
+  "title": "OKEx",
+  "uid": "NnHZ4VDMz",
+  "version": 2
 }
