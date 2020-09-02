@@ -35,6 +35,7 @@ export async function calcPairs(
   return pairsFromEnv.length > 0 ? pairsFromEnv.filter((x) => pairs.includes(x)) : pairs;
 }
 
+export const REDIS_TOPIC_TRADE = `${REDIS_TOPIC_PREFIX}:trade`;
 export const REDIS_TOPIC_SPOT_INDEX_PRICE = `${REDIS_TOPIC_PREFIX}:spot_index_price`;
 export const REDIS_TOPIC_SPOT_INDEX_KLINE = `${REDIS_TOPIC_PREFIX}:spot_index_kline`;
 

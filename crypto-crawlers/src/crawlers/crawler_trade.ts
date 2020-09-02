@@ -3,7 +3,7 @@ import crawl, { SUPPORTED_EXCHANGES, TradeMsg } from 'crypto-crawler';
 import { MarketType, MARKET_TYPES } from 'crypto-markets';
 import yargs from 'yargs';
 import { createLogger, Heartbeat, Publisher } from '../utils';
-import { calcRedisTopic } from './common';
+import { calcPairs, REDIS_TOPIC_TRADE } from './common';
 
 const EXCHANGE_THRESHOLD: { [key: string]: number } = {
   BitMEX: 900,
@@ -38,13 +38,13 @@ async function crawlTrade(
 
       const tradeMsg = msg as TradeMsg;
 
-      publisher.publish(calcRedisTopic(tradeMsg), tradeMsg);
+      publisher.publish(REDIS_TOPIC_TRADE, tradeMsg);
     },
   );
 }
 
 const commandModule: yargs.CommandModule = {
-  command: 'crawler_trade <exchange> <marketType> [pairs]',
+  command: 'crawler_trade <exchange> <marketType>',
   describe: 'Crawl trades',
   // eslint-disable-next-line no-shadow
   builder: (yargs) =>
@@ -58,24 +58,17 @@ const commandModule: yargs.CommandModule = {
         choices: MARKET_TYPES,
         type: 'string',
         demandOption: true,
-      })
-      .options({
-        pairs: {
-          type: 'array',
-          demandOption: true,
-        },
       }),
   handler: async (argv) => {
     const params: {
       exchange: string;
       marketType: MarketType;
-      pairs: string[];
     } = argv as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-    assert.ok(params.pairs.length > 0);
-    assert.ok(process.env.DATA_DIR, 'Please define a DATA_DIR environment variable in .envrc');
+    const pairs = await calcPairs(params.exchange, params.marketType);
+    assert.ok(pairs.length > 0);
 
-    await crawlTrade(params.exchange, params.marketType, params.pairs);
+    await crawlTrade(params.exchange, params.marketType, pairs);
   },
 };
 
