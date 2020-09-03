@@ -8,6 +8,7 @@ import crawlerOkexFundingRateModule from './crawlers/crawler_okex_funding_rate';
 import crawlerSpotindexPriceModule from './crawlers/crawler_spot_index_price';
 import crawlerTickerModule from './crawlers/crawler_ticker';
 import crawlerTradeModule from './crawlers/crawler_trade';
+import klineBuilderModule from './transformations/kline_builder';
 
 // eslint-disable-next-line no-unused-expressions
 yargs
@@ -19,5 +20,6 @@ yargs
   .command(crawlerFundingRateModule)
   .command(crawlerOkexFundingRateModule)
   .command(crawlerSpotindexPriceModule)
+  .command(klineBuilderModule)
   .wrap(null)
   .demandCommand(1, '').argv;

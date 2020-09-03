@@ -49,5 +49,6 @@ export const KAFKA_OKEx_FUNDING_RATE_TOPIC = 'crypto-crawlers.okex_funding_rate'
 export const KAFKA_HB10_TOPIC = 'crypto-crawlers.hb10';
 export const KAFKA_TICKER_TOPIC = 'crypto-crawlers.ticker';
 export const KAFKA_KLINE_TOPIC = 'crypto-crawlers.kline';
+export const KAFKA_KLINE_EXT_TOPIC = 'crypto-crawlers.kline_ext';
 
 export const FUNDING_RATES_DIR = '/tmp/data/funding_rates';

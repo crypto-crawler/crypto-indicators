@@ -92,6 +92,16 @@ const apps = [
   });
 });
 
+apps.push({
+  name: 'kline_builder',
+  script: 'dist/cli.js',
+  args: `kline_builder`,
+  exec_mode: 'fork',
+  instances: 1,
+  autorestart: true,
+  watch: false,
+});
+
 module.exports = {
   apps,
 };
