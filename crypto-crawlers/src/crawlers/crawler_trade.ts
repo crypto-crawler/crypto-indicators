@@ -36,9 +36,7 @@ async function crawlTrade(
     async (msg): Promise<void> => {
       heartbeat.updateHeartbeat();
 
-      const tradeMsg = msg as TradeMsg;
-
-      publisher.publish(REDIS_TOPIC_TRADE, tradeMsg);
+      publisher.publish(REDIS_TOPIC_TRADE, msg as TradeMsg);
     },
   );
 }

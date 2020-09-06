@@ -2,12 +2,12 @@ import { strict as assert } from 'assert';
 import Axios from 'axios';
 import fetchMarkets, { Market } from 'crypto-markets';
 import fs from 'fs';
-import * as kafka from 'kafka-node';
 import _ from 'lodash';
 import mkdirp from 'mkdirp';
 import path from 'path';
 import yargs from 'yargs';
-import { FUNDING_RATES_DIR, KAFKA_FUNDING_RATE_TOPIC } from './common';
+import { Publisher } from '../utils';
+import { FUNDING_RATES_DIR, REDIS_TOPIC_FUNDING_RATE } from './common';
 
 const SWAP_EXCHANGES = ['Binance', 'BitMEX', 'Huobi', 'OKEx']; // exchanges that has Swap market
 
@@ -313,34 +313,11 @@ export async function crawlFundingRates(market: Market): Promise<void> {
     'fundingTime',
   );
 
-  // write to Kafka incrementally
-  const publisher = new kafka.HighLevelProducer(
-    new kafka.KafkaClient({
-      clientId: 'crawler_funding_rate',
-      kafkaHost: process.env.KAFKA_HOST || 'localhost:9092',
-    }),
+  const publisher = new Publisher<FundingRate>(process.env.REDIS_URL || 'redis://localhost:6379');
+  await Promise.all(
+    allFundingRates.map((rate) => publisher.publish(REDIS_TOPIC_FUNDING_RATE, rate)),
   );
-
-  const keyedMessages = allFundingRates.map(
-    (rate) =>
-      new kafka.KeyedMessage(
-        `${rate.exchange}-${rate.pair}-${rate.rawPair}-${rate.fundingTime}`,
-        JSON.stringify(rate),
-      ),
-  );
-  const payloads: kafka.ProduceRequest[] = [
-    { topic: KAFKA_FUNDING_RATE_TOPIC, messages: keyedMessages },
-  ];
-  publisher.send(payloads, (err, data) => {
-    if (err) {
-      console.error(err);
-    } else {
-      assert.equal(KAFKA_FUNDING_RATE_TOPIC, Object.keys(data)[0]);
-      fs.writeFileSync(fundingRatesFile, `${JSON.stringify(allFundingRates, null, 2)}\n`);
-    }
-
-    publisher.close();
-  });
+  publisher.close();
 }
 
 const commandModule: yargs.CommandModule = {

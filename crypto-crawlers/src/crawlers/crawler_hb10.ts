@@ -1,10 +1,9 @@
-import { strict as assert } from 'assert';
 import { crawlHB10, HB10IndexMsg } from 'crypto-crawler/dist/crawler/huobi';
-import * as kafka from 'kafka-node';
 import yargs from 'yargs';
+import { Publisher } from '../utils';
 import { Heartbeat } from '../utils/heartbeat';
 import { createLogger } from '../utils/logger';
-import { KAFKA_HB10_TOPIC } from './common';
+import { REDIS_HB10_TOPIC } from './common';
 
 const commandModule: yargs.CommandModule = {
   command: 'crawler_hb10',
@@ -15,29 +14,15 @@ const commandModule: yargs.CommandModule = {
     const logger = createLogger(`crawler-hb10`);
     const heartbeat = new Heartbeat(logger);
 
-    const publisher = new kafka.HighLevelProducer(
-      new kafka.KafkaClient({
-        clientId: 'crawler_hb10',
-        kafkaHost: process.env.KAFKA_HOST || 'localhost:9092',
-      }),
+    const publisher = new Publisher<HB10IndexMsg>(
+      process.env.REDIS_URL || 'redis://localhost:6379',
     );
 
     crawlHB10(
       async (msg: HB10IndexMsg): Promise<void> => {
         heartbeat.updateHeartbeat();
 
-        const km = new kafka.KeyedMessage(
-          `${msg.exchange}-${msg.id}-${msg.interval}`,
-          JSON.stringify(msg),
-        );
-        const payloads: kafka.ProduceRequest[] = [{ topic: KAFKA_HB10_TOPIC, messages: [km] }];
-        publisher.send(payloads, (err, data) => {
-          if (err) {
-            logger.error(err);
-          } else {
-            assert.equal(KAFKA_HB10_TOPIC, Object.keys(data)[0]);
-          }
-        });
+        publisher.publish(REDIS_HB10_TOPIC, msg);
       },
     );
   },

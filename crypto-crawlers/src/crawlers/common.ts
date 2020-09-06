@@ -38,17 +38,11 @@ export async function calcPairs(
 export const REDIS_TOPIC_TRADE = `${REDIS_TOPIC_PREFIX}:trade`;
 export const REDIS_TOPIC_SPOT_INDEX_PRICE = `${REDIS_TOPIC_PREFIX}:spot_index_price`;
 export const REDIS_TOPIC_SPOT_INDEX_KLINE = `${REDIS_TOPIC_PREFIX}:spot_index_kline`;
+export const REDIS_KLINE_TOPIC = `${REDIS_TOPIC_PREFIX}:kline`;
+export const REDIS_TOPIC_KLINE_EXT = `${REDIS_TOPIC_PREFIX}:kline_ext`;
 
 export const REDIS_TOPIC_FUNDING_RATE = `${REDIS_TOPIC_PREFIX}:funding_rate`;
-
-// Kafka topics
-export const TRADE_TOPIC = 'brick-mover.trade';
-export const KLINE_TOPIC = 'brick-mover.kline';
-export const KAFKA_FUNDING_RATE_TOPIC = 'crypto-crawlers.funding_rate';
-export const KAFKA_OKEx_FUNDING_RATE_TOPIC = 'crypto-crawlers.okex_funding_rate';
-export const KAFKA_HB10_TOPIC = 'crypto-crawlers.hb10';
-export const KAFKA_TICKER_TOPIC = 'crypto-crawlers.ticker';
-export const KAFKA_KLINE_TOPIC = 'crypto-crawlers.kline';
-export const KAFKA_KLINE_EXT_TOPIC = 'crypto-crawlers.kline_ext';
+export const REDIS_TOPIC_OKEX_FUNDING_RATE = `${REDIS_TOPIC_PREFIX}:okex_funding_rate`;
+export const REDIS_HB10_TOPIC = `${REDIS_TOPIC_PREFIX}:hb10`;
 
 export const FUNDING_RATES_DIR = '/tmp/data/funding_rates';

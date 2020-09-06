@@ -30,6 +30,11 @@ export class Subscriber<T> {
       this.consumeFunc(msg);
     });
 
+    // see https://stackoverflow.com/a/10880189/381712
+    client.on('error', (err: Error) => {
+      console.error('Redis error:', err);
+    });
+
     client.subscribe(this.channel);
   }
 }

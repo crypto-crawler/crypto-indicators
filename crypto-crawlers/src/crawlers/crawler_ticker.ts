@@ -1,10 +1,9 @@
 import { strict as assert } from 'assert';
 import crawl, { TickerMsg } from 'crypto-crawler';
 import { MarketType, MARKET_TYPES } from 'crypto-markets';
-import * as kafka from 'kafka-node';
 import yargs from 'yargs';
 import { createLogger, Heartbeat, Publisher } from '../utils';
-import { calcPairs, calcRedisTopic, KAFKA_TICKER_TOPIC } from './common';
+import { calcPairs, calcRedisTopic } from './common';
 
 const EXCHANGE_THRESHOLD: { [key: string]: number } = {
   BitMEX: 900,
@@ -29,13 +28,6 @@ async function crawlTicker(
   const logger = createLogger(`crawler-ticker-${exchange}-${marketType}`);
   const heartbeat = new Heartbeat(logger, EXCHANGE_THRESHOLD[exchange] || 60);
 
-  const kafkaPublisher = new kafka.HighLevelProducer(
-    new kafka.KafkaClient({
-      clientId: 'crawler_ticker',
-      kafkaHost: process.env.KAFKA_HOST || 'localhost:9092',
-    }),
-  );
-
   crawl(
     exchange,
     marketType,
@@ -44,22 +36,7 @@ async function crawlTicker(
     async (msg): Promise<void> => {
       heartbeat.updateHeartbeat();
 
-      const tickerMsg = msg as TickerMsg;
-
-      publisher.publish(calcRedisTopic(tickerMsg), tickerMsg);
-
-      const km = new kafka.KeyedMessage(
-        `${msg.exchange}-${msg.marketType}-${msg.pair}-${msg.rawPair}`,
-        JSON.stringify(tickerMsg),
-      );
-      const payloads: kafka.ProduceRequest[] = [{ topic: KAFKA_TICKER_TOPIC, messages: [km] }];
-      kafkaPublisher.send(payloads, (err, data) => {
-        if (err) {
-          logger.error(err);
-        } else {
-          assert.equal(KAFKA_TICKER_TOPIC, Object.keys(data)[0]);
-        }
-      });
+      publisher.publish(calcRedisTopic(msg), msg as TickerMsg);
     },
   );
 }

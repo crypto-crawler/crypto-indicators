@@ -2,11 +2,11 @@ import { strict as assert } from 'assert';
 import { FundingRateMsg } from 'crypto-crawler';
 import { crawlRaw } from 'crypto-crawler/dist/crawler/okex';
 import fetchMarkets from 'crypto-markets';
-import * as kafka from 'kafka-node';
 import yargs from 'yargs';
+import { Publisher } from '../utils';
 import { Heartbeat } from '../utils/heartbeat';
 import { createLogger } from '../utils/logger';
-import { KAFKA_OKEx_FUNDING_RATE_TOPIC } from './common';
+import { REDIS_TOPIC_OKEX_FUNDING_RATE } from './common';
 
 function instrument_id_to_pair(instrument_id: string): string {
   const arr = instrument_id.split('-');
@@ -26,11 +26,8 @@ const commandModule: yargs.CommandModule = {
     const logger = createLogger(`crawler-okex-funding-rate`);
     const heartbeat = new Heartbeat(logger, 120);
 
-    const publisher = new kafka.HighLevelProducer(
-      new kafka.KafkaClient({
-        clientId: 'crawler_okex_funding_rate',
-        kafkaHost: process.env.KAFKA_HOST || 'localhost:9092',
-      }),
+    const publisher = new Publisher<FundingRateMsg>(
+      process.env.REDIS_URL || 'redis://localhost:6379',
     );
 
     crawlRaw(
@@ -61,23 +58,9 @@ const commandModule: yargs.CommandModule = {
           raw: x,
         }));
 
-        const keyedMessages = rates.map(
-          (rate) =>
-            new kafka.KeyedMessage(
-              `${rate.exchange}-${rate.marketType}-${rate.pair}-${rate.rawPair}-${rate.timestamp}`,
-              JSON.stringify(rate),
-            ),
+        await Promise.all(
+          rates.map((rate) => publisher.publish(REDIS_TOPIC_OKEX_FUNDING_RATE, rate)),
         );
-        const payloads: kafka.ProduceRequest[] = [
-          { topic: KAFKA_OKEx_FUNDING_RATE_TOPIC, messages: keyedMessages },
-        ];
-        publisher.send(payloads, (err, data) => {
-          if (err) {
-            logger.error(err);
-          } else {
-            assert.equal(KAFKA_OKEx_FUNDING_RATE_TOPIC, Object.keys(data)[0]);
-          }
-        });
       },
     );
   },

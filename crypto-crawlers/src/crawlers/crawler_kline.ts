@@ -1,23 +1,18 @@
 import { strict as assert } from 'assert';
 import crawl, { KlineMsg, SUPPORTED_EXCHANGES } from 'crypto-crawler';
 import { MarketType, MARKET_TYPES } from 'crypto-markets';
-import * as kafka from 'kafka-node';
 import yargs from 'yargs';
+import { Publisher } from '../utils';
 import { Heartbeat } from '../utils/heartbeat';
 import { createLogger } from '../utils/logger';
-import { calcPairs, KAFKA_KLINE_TOPIC } from './common';
+import { calcPairs, REDIS_KLINE_TOPIC } from './common';
 
 async function crawlKline(
   exchange: string,
   marketType: MarketType,
   pairs: readonly string[],
 ): Promise<void> {
-  const publisher = new kafka.HighLevelProducer(
-    new kafka.KafkaClient({
-      clientId: `crawler-kline-${exchange}-${marketType}`,
-      kafkaHost: process.env.KAFKA_HOST || 'localhost:9092',
-    }),
-  );
+  const publisher = new Publisher<KlineMsg>(process.env.REDIS_URL || 'redis://localhost:6379');
 
   const logger = createLogger(`crawler-kline-${exchange}-${marketType}`);
   const heartbeat = new Heartbeat(logger, 120);
@@ -39,18 +34,7 @@ async function crawlKline(
       if (mymap.has(key)) {
         const prev = mymap.get(key)!;
         if (msg.timestamp > prev.timestamp) {
-          const km = new kafka.KeyedMessage(
-            `${prev.exchange}-${prev.marketType}-${prev.pair}-${prev.rawPair}-${prev.period}-${prev.timestamp}`,
-            JSON.stringify(prev),
-          );
-          const payloads: kafka.ProduceRequest[] = [{ topic: KAFKA_KLINE_TOPIC, messages: [km] }];
-          publisher.send(payloads, (err, data) => {
-            if (err) {
-              logger.error(err);
-            } else {
-              assert.equal(KAFKA_KLINE_TOPIC, Object.keys(data)[0]);
-            }
-          });
+          publisher.publish(REDIS_KLINE_TOPIC, prev);
         }
       }
       mymap.set(key, klineMsg);

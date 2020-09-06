@@ -11,4 +11,8 @@ export class Publisher<T> {
   async publish(topic: string, msg: T): Promise<void> {
     this.client.publish(topic, JSON.stringify(msg));
   }
+
+  close(): void {
+    this.client.quit();
+  }
 }
