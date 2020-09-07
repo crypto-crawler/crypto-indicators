@@ -1,0 +1,22 @@
+# This file is where you define your pipelines. You can define multiple.
+# For more information on multiple pipelines, see the documentation:
+#   https://www.elastic.co/guide/en/logstash/current/multiple-pipelines.html
+
+- pipeline.id: kline_ext
+  path.config: "/usr/share/logstash/pipeline/kline_ext.conf"
+  pipeline.workers: 1
+- pipeline.id: kline
+  path.config: "/usr/share/logstash/pipeline/kline.conf"
+  pipeline.workers: 1
+- pipeline.id: ticker
+  path.config: "/usr/share/logstash/pipeline/ticker.conf"
+  pipeline.workers: 1
+- pipeline.id: hb10
+  path.config: "/usr/share/logstash/pipeline/hb10.conf"
+  pipeline.workers: 1
+- pipeline.id: okex_funding_rate
+  path.config: "/usr/share/logstash/pipeline/okex_funding_rate.conf"
+  pipeline.workers: 1
+- pipeline.id: funding_rate
+  path.config: "/usr/share/logstash/pipeline/funding_rate.conf"
+  pipeline.workers: 1

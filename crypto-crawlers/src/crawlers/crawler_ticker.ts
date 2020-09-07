@@ -3,7 +3,7 @@ import crawl, { TickerMsg } from 'crypto-crawler';
 import { MarketType, MARKET_TYPES } from 'crypto-markets';
 import yargs from 'yargs';
 import { createLogger, Heartbeat, Publisher } from '../utils';
-import { calcPairs, calcRedisTopic } from './common';
+import { calcPairs, REDIS_TOPIC_TICKER } from './common';
 
 const EXCHANGE_THRESHOLD: { [key: string]: number } = {
   BitMEX: 900,
@@ -28,6 +28,10 @@ async function crawlTicker(
   const logger = createLogger(`crawler-ticker-${exchange}-${marketType}`);
   const heartbeat = new Heartbeat(logger, EXCHANGE_THRESHOLD[exchange] || 60);
 
+  // key=${exchange}-${marketType}-${rawPair}-${minute}
+  const mymap = new Map<string, TickerMsg>();
+  const interval = 60000; // one minute
+
   crawl(
     exchange,
     marketType,
@@ -35,8 +39,17 @@ async function crawlTicker(
     pairs,
     async (msg): Promise<void> => {
       heartbeat.updateHeartbeat();
+      const tickerMsg = msg as TickerMsg;
 
-      publisher.publish(calcRedisTopic(msg), msg as TickerMsg);
+      const key = `${msg.exchange}-${msg.marketType}-${msg.rawPair}`;
+
+      if (mymap.has(key)) {
+        const prev = mymap.get(key)!;
+        if (Math.floor(msg.timestamp / interval) > Math.floor(prev.timestamp / interval)) {
+          publisher.publish(REDIS_TOPIC_TICKER, prev);
+        }
+      }
+      mymap.set(key, tickerMsg);
     },
   );
 }

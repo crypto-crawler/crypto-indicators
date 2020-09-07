@@ -1,22 +1,6 @@
-import { Msg } from 'crypto-crawler';
 import fetchMarkets, { MarketType } from 'crypto-markets';
 
 export const REDIS_TOPIC_PREFIX = 'crypto-crawlers';
-
-// Topics
-// eslint-disable-next-line import/prefer-default-export
-export function calcRedisTopic(msg: Msg): string {
-  switch (msg.channelType) {
-    case 'BBO':
-      return `${REDIS_TOPIC_PREFIX}:bbo-${msg.exchange}-${msg.marketType}`;
-    case 'Ticker':
-      return `${REDIS_TOPIC_PREFIX}:ticker-${msg.exchange}-${msg.marketType}`;
-    case 'Trade':
-      return `${REDIS_TOPIC_PREFIX}:trade-${msg.exchange}-${msg.marketType}`;
-    default:
-      throw new Error(`Unknown channelType ${msg.channelType}`);
-  }
-}
 
 export async function calcPairs(
   exchange: string,
@@ -35,6 +19,7 @@ export async function calcPairs(
   return pairsFromEnv.length > 0 ? pairsFromEnv.filter((x) => pairs.includes(x)) : pairs;
 }
 
+export const REDIS_TOPIC_TICKER = `${REDIS_TOPIC_PREFIX}:ticker`;
 export const REDIS_TOPIC_TRADE = `${REDIS_TOPIC_PREFIX}:trade`;
 export const REDIS_TOPIC_SPOT_INDEX_PRICE = `${REDIS_TOPIC_PREFIX}:spot_index_price`;
 export const REDIS_TOPIC_SPOT_INDEX_KLINE = `${REDIS_TOPIC_PREFIX}:spot_index_kline`;
