@@ -97,7 +97,6 @@ const commandModule: yargs.CommandModule = {
     let prevBarTimeEnd = -1;
     let prevBarTimeBegin = -1;
     let curBarTimeEnd = -1;
-    let nextBarTimeEnd = -1;
 
     let cachePrev = new Map<string, TradeMsg[]>();
     let cache = new Map<string, TradeMsg[]>();
@@ -111,7 +110,6 @@ const commandModule: yargs.CommandModule = {
           prevBarTimeEnd = Math.floor(tradeMsg.timestamp / INTERVAL) * INTERVAL;
           prevBarTimeBegin = prevBarTimeEnd - INTERVAL;
           curBarTimeEnd = prevBarTimeEnd + INTERVAL;
-          nextBarTimeEnd = curBarTimeEnd + INTERVAL;
         }
 
         if (tradeMsg.timestamp < prevBarTimeBegin) {
@@ -140,20 +138,10 @@ const commandModule: yargs.CommandModule = {
           prevBarTimeEnd = Math.floor(tradeMsg.timestamp / INTERVAL) * INTERVAL;
           prevBarTimeBegin = prevBarTimeEnd - INTERVAL;
           curBarTimeEnd = prevBarTimeEnd + INTERVAL;
-          nextBarTimeEnd = curBarTimeEnd + INTERVAL;
 
           cachePrev = cache;
           cache = new Map<string, TradeMsg[]>();
-
-          if (tradeMsg.timestamp < nextBarTimeEnd) {
-            cache.set(key, [tradeMsg]);
-          } else {
-            logger.error(
-              `Future msg, nextBarTimeEnd: ${nextBarTimeEnd}, tradeMsg: ${JSON.stringify(
-                tradeMsg,
-              )}`,
-            );
-          }
+          cache.set(key, [tradeMsg]);
         }
       },
       REDIS_TOPIC_TRADE,
