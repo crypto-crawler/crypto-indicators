@@ -8,7 +8,7 @@ export async function fetchMarketsWithCache(
   marketType: MarketType,
 ): Promise<readonly Market[]> {
   const redisCache = new RedisCache(process.env.REDIS_URL || 'redis://localhost:6379');
-  const key = `${REDIS_TOPIC_PREFIX}:pairs:${exchange}:${marketType}`;
+  const key = `${REDIS_TOPIC_PREFIX}:markets:${exchange}:${marketType}`;
   const pairsRedis = await redisCache.get(key);
   if (pairsRedis) {
     redisCache.close();
