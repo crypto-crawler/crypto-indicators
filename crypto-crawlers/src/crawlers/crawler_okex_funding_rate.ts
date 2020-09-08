@@ -1,12 +1,11 @@
 import { strict as assert } from 'assert';
 import { FundingRateMsg } from 'crypto-crawler';
 import { crawlRaw } from 'crypto-crawler/dist/crawler/okex';
-import fetchMarkets from 'crypto-markets';
 import yargs from 'yargs';
 import { Publisher } from '../utils';
 import { Heartbeat } from '../utils/heartbeat';
 import { createLogger } from '../utils/logger';
-import { REDIS_TOPIC_OKEX_FUNDING_RATE } from './common';
+import { fetchMarketsWithCache, REDIS_TOPIC_OKEX_FUNDING_RATE } from './common';
 
 function instrument_id_to_pair(instrument_id: string): string {
   const arr = instrument_id.split('-');
@@ -19,7 +18,7 @@ const commandModule: yargs.CommandModule = {
   // eslint-disable-next-line no-shadow
   builder: (yargs) => yargs.options({}),
   handler: async () => {
-    const markets = (await fetchMarkets('OKEx', 'Swap')).filter((m) => m.active);
+    const markets = await fetchMarketsWithCache('OKEx', 'Swap');
     const channels = markets.map((m) => `swap/funding_rate:${m.baseId}-${m.quoteId}-SWAP`);
     assert.ok(channels.length > 0);
 

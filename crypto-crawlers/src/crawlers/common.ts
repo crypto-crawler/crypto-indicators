@@ -1,17 +1,34 @@
-import fetchMarkets, { MarketType } from 'crypto-markets';
+import fetchMarkets, { Market, MarketType } from 'crypto-markets';
+import { RedisCache } from '../utils/redis_cache';
 
 export const REDIS_TOPIC_PREFIX = 'crypto-crawlers';
+
+export async function fetchMarketsWithCache(
+  exchange: string,
+  marketType: MarketType,
+): Promise<readonly Market[]> {
+  const redisCache = new RedisCache(process.env.REDIS_URL || 'redis://localhost:6379');
+  const key = `${REDIS_TOPIC_PREFIX}:pairs:${exchange}:${marketType}`;
+  const pairsRedis = await redisCache.get(key);
+  if (pairsRedis) {
+    redisCache.close();
+    return JSON.parse(pairsRedis);
+  }
+
+  const markets = (await fetchMarkets(exchange, marketType)).filter((m) => m.active);
+  redisCache.set(key, JSON.stringify(markets));
+  redisCache.close();
+  return markets;
+}
 
 export async function calcPairs(
   exchange: string,
   marketType: MarketType,
 ): Promise<readonly string[]> {
-  const swapCoins = new Set(
-    (await fetchMarkets(exchange, 'Swap')).filter((m) => m.active).map((m) => m.base),
-  );
+  const swapCoins = new Set((await fetchMarketsWithCache(exchange, 'Swap')).map((m) => m.base));
   // USD or USDT pairs
-  const pairs = (await fetchMarkets(exchange, marketType))
-    .filter((m) => m.active && (m.quote === 'USD' || m.quote === 'USDT') && swapCoins.has(m.base))
+  const pairs = (await fetchMarketsWithCache(exchange, marketType))
+    .filter((m) => (m.quote === 'USD' || m.quote === 'USDT') && swapCoins.has(m.base))
     .map((m) => m.pair);
 
   const pairsFromEnv = (process.env.PAIRS || ' ').split(' ').filter((x) => x);

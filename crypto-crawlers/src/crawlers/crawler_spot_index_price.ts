@@ -1,11 +1,14 @@
 import { strict as assert } from 'assert';
 import { crawlIndex, IndexKlineMsg, IndexTickerMsg } from 'crypto-crawler/dist/crawler/okex';
-import fetchMarkets from 'crypto-markets';
 import yargs from 'yargs';
 import { Publisher } from '../utils';
 import { Heartbeat } from '../utils/heartbeat';
 import { createLogger } from '../utils/logger';
-import { REDIS_TOPIC_SPOT_INDEX_KLINE, REDIS_TOPIC_SPOT_INDEX_PRICE } from './common';
+import {
+  fetchMarketsWithCache,
+  REDIS_TOPIC_SPOT_INDEX_KLINE,
+  REDIS_TOPIC_SPOT_INDEX_PRICE,
+} from './common';
 
 const commandModule: yargs.CommandModule = {
   command: 'crawler_spot_index_price',
@@ -13,8 +16,7 @@ const commandModule: yargs.CommandModule = {
   // eslint-disable-next-line no-shadow
   builder: (yargs) => yargs.options({}),
   handler: async () => {
-    const swapMarkets = (await fetchMarkets('OKEx', 'Swap')).filter((m) => m.active);
-    const pairs = swapMarkets.map((m) => m.pair);
+    const pairs = (await fetchMarketsWithCache('OKEx', 'Swap')).map((m) => m.pair);
     assert.ok(pairs.length > 0);
 
     const logger = createLogger(`crawler-spot-index-price`);

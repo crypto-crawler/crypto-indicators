@@ -1,13 +1,13 @@
 import { strict as assert } from 'assert';
 import Axios from 'axios';
-import fetchMarkets, { Market } from 'crypto-markets';
+import { Market } from 'crypto-markets';
 import fs from 'fs';
 import _ from 'lodash';
 import mkdirp from 'mkdirp';
 import path from 'path';
 import yargs from 'yargs';
 import { Publisher } from '../utils';
-import { FUNDING_RATES_DIR, REDIS_TOPIC_FUNDING_RATE } from './common';
+import { fetchMarketsWithCache, FUNDING_RATES_DIR, REDIS_TOPIC_FUNDING_RATE } from './common';
 
 const SWAP_EXCHANGES = ['Binance', 'BitMEX', 'Huobi', 'OKEx']; // exchanges that has Swap market
 
@@ -328,7 +328,7 @@ const commandModule: yargs.CommandModule = {
   handler: async () => {
     await Promise.all(
       SWAP_EXCHANGES.map(async (exchange) => {
-        const swapMarkets = (await fetchMarkets(exchange, 'Swap')).filter((m) => m.active);
+        const swapMarkets = await fetchMarketsWithCache(exchange, 'Swap');
 
         return Promise.all(swapMarkets.map((market) => crawlFundingRates(market)));
       }),
