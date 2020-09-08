@@ -102,8 +102,7 @@ const commandModule: yargs.CommandModule = {
     let cache = new Map<string, TradeMsg[]>();
 
     const subscriber = new Subscriber<TradeMsg>(
-      async (msg): Promise<void> => {
-        const tradeMsg = msg as TradeMsg;
+      async (tradeMsg): Promise<void> => {
         const key = `${tradeMsg.exchange}-${tradeMsg.marketType}-${tradeMsg.pair}-${tradeMsg.rawPair}`;
 
         if (prevBarTimeEnd === -1) {

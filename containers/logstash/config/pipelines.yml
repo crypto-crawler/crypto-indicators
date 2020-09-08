@@ -20,3 +20,6 @@
 - pipeline.id: funding_rate
   path.config: "/usr/share/logstash/pipeline/funding_rate.conf"
   pipeline.workers: 1
+- pipeline.id: btc_volume_ratio
+  path.config: "/usr/share/logstash/pipeline/btc_volume_ratio.conf"
+  pipeline.workers: 1

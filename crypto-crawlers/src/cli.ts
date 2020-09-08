@@ -8,10 +8,12 @@ import crawlerOkexFundingRateModule from './crawlers/crawler_okex_funding_rate';
 import crawlerSpotindexPriceModule from './crawlers/crawler_spot_index_price';
 import crawlerTickerModule from './crawlers/crawler_ticker';
 import crawlerTradeModule from './crawlers/crawler_trade';
+import btcVolumeRatioModule from './transformations/btc_volume_ratio';
 import klineBuilderModule from './transformations/kline_builder';
 
 // eslint-disable-next-line no-unused-expressions
 yargs
+  .command(btcVolumeRatioModule)
   .command(crawlerBitMEXInstrumentModule)
   .command(crawlerKlineModule)
   .command(crawlerHB10Module)

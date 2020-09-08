@@ -36,6 +36,20 @@ const apps = [
     exec_mode: 'fork',
     instances: 1,
   },
+  {
+    name: 'kline_builder',
+    script: 'dist/cli.js',
+    args: `kline_builder`,
+    exec_mode: 'fork',
+    instances: 1,
+  },
+  {
+    name: 'btc_volume_ratio',
+    script: 'dist/cli.js',
+    args: `btc_volume_ratio`,
+    exec_mode: 'fork',
+    instances: 1,
+  },
 ];
 
 ['Binance', 'Huobi', 'OKEx']
@@ -90,16 +104,6 @@ const apps = [
     autorestart: true,
     watch: false,
   });
-});
-
-apps.push({
-  name: 'kline_builder',
-  script: 'dist/cli.js',
-  args: `kline_builder`,
-  exec_mode: 'fork',
-  instances: 1,
-  autorestart: true,
-  watch: false,
 });
 
 module.exports = {

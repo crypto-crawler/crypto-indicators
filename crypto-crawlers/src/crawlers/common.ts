@@ -47,4 +47,6 @@ export const REDIS_TOPIC_FUNDING_RATE = `${REDIS_TOPIC_PREFIX}:funding_rate`;
 export const REDIS_TOPIC_OKEX_FUNDING_RATE = `${REDIS_TOPIC_PREFIX}:okex_funding_rate`;
 export const REDIS_HB10_TOPIC = `${REDIS_TOPIC_PREFIX}:hb10`;
 
+export const REDIS_TOPIC_BTC_VOLUME_RATIO = `${REDIS_TOPIC_PREFIX}:btc_volume_ratio`;
+
 export const FUNDING_RATES_DIR = '/tmp/data/funding_rates';
