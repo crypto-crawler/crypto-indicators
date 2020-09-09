@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  grafana:
+    environment:
+      - GF_SERVER_DOMAIN=crypto-indicators.org
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    restart: always
+    volumes:
+      - "./configs/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro"
+    depends_on:
+      - grafana
