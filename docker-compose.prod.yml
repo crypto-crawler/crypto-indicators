@@ -1,9 +1,12 @@
-version: "3.8"
+version: "3.3"
 
 services:
   grafana:
     environment:
       - GF_SERVER_DOMAIN=crypto-indicators.org
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_BASIC_ENABLED=false
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
   nginx:
     image: nginx:latest
     ports:

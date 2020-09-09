@@ -2,6 +2,10 @@
 
 Calculate all kinds of indicators to assist cryptocurrency trading.
 
+Website: <http://crypto-indicators.org>
+
+If you want to run this project locally, please read on.
+
 ## Quickstart
 
 ```bash
