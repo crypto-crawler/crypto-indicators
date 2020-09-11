@@ -48,7 +48,7 @@ services:
 
   crawlers:
     build:
-      context: ./
+      context: ./nodejs
       dockerfile: Dockerfile.crawlers
     image: crypto-crawlers:latest
     environment:
