@@ -1,8 +1,8 @@
 import { TickerMsg } from 'crypto-crawler';
 import { MarketType } from 'crypto-markets';
+import { Publisher, Subscriber } from 'utils';
 import yargs from 'yargs';
 import { REDIS_TOPIC_BTC_VOLUME_RATIO, REDIS_TOPIC_TICKER } from '../crawlers/common';
-import { Publisher, Subscriber } from '../utils';
 
 interface BTCVolumeRatioMsg {
   exchange: string;

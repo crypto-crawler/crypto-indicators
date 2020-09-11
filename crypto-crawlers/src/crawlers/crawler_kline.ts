@@ -1,10 +1,8 @@
 import { strict as assert } from 'assert';
 import crawl, { KlineMsg, SUPPORTED_EXCHANGES } from 'crypto-crawler';
 import { MarketType, MARKET_TYPES } from 'crypto-markets';
+import { createLogger, Heartbeat, Publisher } from 'utils';
 import yargs from 'yargs';
-import { Publisher } from '../utils';
-import { Heartbeat } from '../utils/heartbeat';
-import { createLogger } from '../utils/logger';
 import { calcPairs, REDIS_KLINE_TOPIC } from './common';
 
 async function crawlKline(

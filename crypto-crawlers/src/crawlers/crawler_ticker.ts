@@ -1,8 +1,8 @@
 import { strict as assert } from 'assert';
 import crawl, { TickerMsg } from 'crypto-crawler';
 import { MarketType, MARKET_TYPES } from 'crypto-markets';
+import { createLogger, Heartbeat, Publisher } from 'utils';
 import yargs from 'yargs';
-import { createLogger, Heartbeat, Publisher } from '../utils';
 import { calcPairs, REDIS_TOPIC_TICKER } from './common';
 
 const EXCHANGE_THRESHOLD: { [key: string]: number } = {

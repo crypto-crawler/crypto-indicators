@@ -1,8 +1,6 @@
 import { crawlInstrument } from 'crypto-crawler/dist/crawler/bitmex';
+import { createLogger, Heartbeat, Publisher } from 'utils';
 import yargs from 'yargs';
-import { Publisher } from '../utils';
-import { Heartbeat } from '../utils/heartbeat';
-import { createLogger } from '../utils/logger';
 
 const commandModule: yargs.CommandModule = {
   command: 'crawler_bitmex_instrument',

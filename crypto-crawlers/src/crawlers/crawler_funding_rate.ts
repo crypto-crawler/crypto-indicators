@@ -5,8 +5,8 @@ import fs from 'fs';
 import _ from 'lodash';
 import mkdirp from 'mkdirp';
 import path from 'path';
+import { Publisher } from 'utils';
 import yargs from 'yargs';
-import { Publisher } from '../utils';
 import { fetchMarketsWithCache, FUNDING_RATES_DIR, REDIS_TOPIC_FUNDING_RATE } from './common';
 
 const SWAP_EXCHANGES = ['Binance', 'BitMEX', 'Huobi', 'OKEx']; // exchanges that has Swap market

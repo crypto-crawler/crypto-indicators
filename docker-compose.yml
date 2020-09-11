@@ -48,7 +48,8 @@ services:
 
   crawlers:
     build:
-      context: ./crypto-crawlers
+      context: ./
+      dockerfile: Dockerfile.crawlers
     image: crypto-crawlers:latest
     environment:
       - REDIS_URL=redis://redis:6379

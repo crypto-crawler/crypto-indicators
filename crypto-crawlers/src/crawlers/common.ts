@@ -1,5 +1,5 @@
 import fetchMarkets, { Market, MarketType } from 'crypto-markets';
-import { RedisCache } from '../utils/redis_cache';
+import { RedisCache } from 'utils';
 
 export const REDIS_TOPIC_PREFIX = 'crypto-crawlers';
 

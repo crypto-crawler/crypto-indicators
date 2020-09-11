@@ -1,9 +1,7 @@
 import { strict as assert } from 'assert';
 import { crawlIndex, IndexKlineMsg, IndexTickerMsg } from 'crypto-crawler/dist/crawler/okex';
+import { createLogger, Heartbeat, Publisher } from 'utils';
 import yargs from 'yargs';
-import { Publisher } from '../utils';
-import { Heartbeat } from '../utils/heartbeat';
-import { createLogger } from '../utils/logger';
 import {
   fetchMarketsWithCache,
   REDIS_TOPIC_SPOT_INDEX_KLINE,

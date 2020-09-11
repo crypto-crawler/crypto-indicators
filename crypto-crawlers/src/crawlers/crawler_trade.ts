@@ -1,8 +1,8 @@
 import { strict as assert } from 'assert';
 import crawl, { SUPPORTED_EXCHANGES, TradeMsg } from 'crypto-crawler';
 import { MarketType, MARKET_TYPES } from 'crypto-markets';
+import { createLogger, Heartbeat, Publisher } from 'utils';
 import yargs from 'yargs';
-import { createLogger, Heartbeat, Publisher } from '../utils';
 import { calcPairs, REDIS_TOPIC_TRADE } from './common';
 
 const EXCHANGE_THRESHOLD: { [key: string]: number } = {

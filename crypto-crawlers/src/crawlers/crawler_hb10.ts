@@ -1,8 +1,6 @@
 import { crawlHB10, HB10IndexMsg } from 'crypto-crawler/dist/crawler/huobi';
+import { createLogger, Heartbeat, Publisher } from 'utils';
 import yargs from 'yargs';
-import { Publisher } from '../utils';
-import { Heartbeat } from '../utils/heartbeat';
-import { createLogger } from '../utils/logger';
 import { REDIS_HB10_TOPIC } from './common';
 
 const commandModule: yargs.CommandModule = {

@@ -1,10 +1,8 @@
 import { strict as assert } from 'assert';
 import { FundingRateMsg } from 'crypto-crawler';
 import { crawlRaw } from 'crypto-crawler/dist/crawler/okex';
+import { createLogger, Heartbeat, Publisher } from 'utils';
 import yargs from 'yargs';
-import { Publisher } from '../utils';
-import { Heartbeat } from '../utils/heartbeat';
-import { createLogger } from '../utils/logger';
 import { fetchMarketsWithCache, REDIS_TOPIC_OKEX_FUNDING_RATE } from './common';
 
 function instrument_id_to_pair(instrument_id: string): string {

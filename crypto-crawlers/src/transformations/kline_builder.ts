@@ -1,9 +1,9 @@
 import { strict as assert } from 'assert';
 import { TradeMsg } from 'crypto-crawler';
 import _ from 'lodash';
+import { createLogger, Publisher, Subscriber } from 'utils';
 import yargs from 'yargs';
 import { REDIS_TOPIC_KLINE_EXT, REDIS_TOPIC_TRADE } from '../crawlers/common';
-import { createLogger, Publisher, Subscriber } from '../utils';
 import { TimeBar } from './time_bar';
 
 const INTERVAL = 60000; // 1 minute in milliseconds
@@ -102,7 +102,7 @@ const commandModule: yargs.CommandModule = {
     let cache = new Map<string, TradeMsg[]>();
 
     const subscriber = new Subscriber<TradeMsg>(
-      async (tradeMsg): Promise<void> => {
+      async (tradeMsg: TradeMsg): Promise<void> => {
         const key = `${tradeMsg.exchange}-${tradeMsg.marketType}-${tradeMsg.pair}-${tradeMsg.rawPair}`;
 
         if (prevBarTimeEnd === -1) {
