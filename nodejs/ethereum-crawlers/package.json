@@ -1,0 +1,68 @@
+{
+  "name": "ethereum-crawlers",
+  "version": "0.0.1",
+  "description": "Crawl information from the Ethereum public blockchain.",
+  "bin": "dist/cli.js",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node ./dist/index.js",
+    "lint": "eslint . --ext '.js,.jsx,.ts,.tsx,.md'",
+    "prettier": "prettier -c --write '**/*'",
+    "prepare": "npm run build && npm run lint && npm run prettier"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run prepare"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/soulmachine/crypto-indicators.git"
+  },
+  "keywords": [
+    "bitcoin",
+    "blockchain",
+    "cryptocurrency"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "author": "soulmachine",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/soulmachine/crypto-indicators/issues"
+  },
+  "homepage": "https://github.com/soulmachine/crypto-indicators",
+  "devDependencies": {
+    "@types/lodash": "^4.14.161",
+    "@types/mkdirp": "^1.0.1",
+    "@types/node": "^14.6.4",
+    "@types/redis": "^2.8.27",
+    "@types/yargs": "^15.0.5",
+    "@typescript-eslint/eslint-plugin": "^4.1.0",
+    "@typescript-eslint/parser": "^4.1.0",
+    "eslint": "^7.8.1",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-markdown": "^1.0.2",
+    "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.3.0",
+    "prettier": "^2.1.1",
+    "typescript": "^4.0.2"
+  },
+  "dependencies": {
+    "axios": "^0.20.0",
+    "lodash": "^4.17.20",
+    "mkdirp": "^1.0.4",
+    "redis": "^3.0.2",
+    "utils": "file:../utils/",
+    "web3": "^1.2.11",
+    "web3-eth": "^1.2.11",
+    "winston": "^3.3.3",
+    "yargs": "^16.0.3"
+  }
+}

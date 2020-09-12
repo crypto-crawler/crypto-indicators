@@ -46,13 +46,25 @@ services:
       - influxdb
     restart: always
 
-  crawlers:
+  crypto_crawlers:
     build:
       context: ./nodejs
       dockerfile: Dockerfile.crawlers
     image: crypto-crawlers:latest
     environment:
       - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+    restart: always
+
+  ethereum_crawlers:
+    build:
+      context: ./nodejs
+      dockerfile: Dockerfile.ethereum
+    image: ethereum-crawlers:latest
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - FULL_NODE_URL=wss://mainnet.infura.io/ws/v3/6866aa0c8c3d48638fedf2d83c85f4b8
     depends_on:
       - redis
     restart: always

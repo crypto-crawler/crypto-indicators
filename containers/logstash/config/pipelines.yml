@@ -23,3 +23,9 @@
 - pipeline.id: btc_volume_ratio
   path.config: "/usr/share/logstash/pipeline/btc_volume_ratio.conf"
   pipeline.workers: 1
+- pipeline.id: eth_block_header
+  path.config: "/usr/share/logstash/pipeline/eth_block_header.conf"
+  pipeline.workers: 1
+- pipeline.id: eth_gas_price
+  path.config: "/usr/share/logstash/pipeline/eth_gas_price.conf"
+  pipeline.workers: 1

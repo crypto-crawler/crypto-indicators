@@ -10,9 +10,9 @@ WORKDIR /tmp/nodejs/utils
 COPY --chown=${USERNAME}:${USERNAME} ./utils/ ./
 RUN rm -rf node_modules/ && rm -rf dist/ && npm install && npm run build
 
-RUN mkdir -p /tmp/nodejs/crypto-crawlers
-WORKDIR /tmp/nodejs/crypto-crawlers
-COPY --chown=${USERNAME}:${USERNAME} ./crypto-crawlers/ ./
+RUN mkdir -p /tmp/nodejs/ethereum-crawlers
+WORKDIR /tmp/nodejs/ethereum-crawlers
+COPY --chown=${USERNAME}:${USERNAME} ./ethereum-crawlers/ ./
 RUN rm -rf node_modules/ && rm -rf dist/ && npm install && npm run build
 
 
@@ -24,10 +24,10 @@ ARG USERNAME
 USER ${USERNAME}
 ENV HOME /home/${USERNAME}
 ENV USER ${USERNAME}
-RUN mkdir /home/${USERNAME}/crypto-crawlers
-WORKDIR /home/${USERNAME}/crypto-crawlers
+RUN mkdir /home/${USERNAME}/ethereum-crawlers
+WORKDIR /home/${USERNAME}/ethereum-crawlers
 
 COPY --from=builder --chown=${USERNAME}:${USERNAME} /tmp/nodejs/utils/ ../utils/
-COPY --from=builder --chown=${USERNAME}:${USERNAME} /tmp/nodejs/crypto-crawlers/ ./
+COPY --from=builder --chown=${USERNAME}:${USERNAME} /tmp/nodejs/ethereum-crawlers/ ./
 
 CMD ["pm2-runtime", "start", "pm2.config.js"]
