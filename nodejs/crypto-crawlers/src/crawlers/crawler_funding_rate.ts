@@ -21,12 +21,12 @@ interface FundingRate {
 }
 
 async function crawlOKExFundingRateCurrent(market: Market): Promise<FundingRate> {
-  assert.equal(market.type, 'Swap');
+  assert.strictEqual(market.type, 'Swap');
 
   const response = await Axios.get(
     `https://www.okex.com/api/swap/v3/instruments/${market.id}/funding_time`,
   );
-  assert.equal(response.status, 200);
+  assert.strictEqual(response.status, 200);
 
   const obj = response.data as {
     instrument_id: string;
@@ -49,12 +49,12 @@ async function crawlOKExFundingRateCurrent(market: Market): Promise<FundingRate>
 }
 
 async function crawlOKExFundingRateHistory(market: Market): Promise<readonly FundingRate[]> {
-  assert.equal(market.type, 'Swap');
+  assert.strictEqual(market.type, 'Swap');
 
   const response = await Axios.get(
     `https://www.okex.com/api/swap/v3/instruments/${market.id}/historical_funding_rate`,
   );
-  assert.equal(response.status, 200);
+  assert.strictEqual(response.status, 200);
 
   const arr = response.data as ReadonlyArray<{
     instrument_id: string;
@@ -96,12 +96,12 @@ async function crawlBinanceFundingRateOneshot(
   market: Market,
   startTime: number,
 ): Promise<readonly FundingRate[]> {
-  assert.equal(market.type, 'Swap');
+  assert.strictEqual(market.type, 'Swap');
 
   const response = await Axios.get(
     `https://fapi.binance.com/fapi/v1/fundingRate?symbol=${market.id}&startTime=${startTime}&limit=1000`,
   );
-  assert.equal(response.status, 200);
+  assert.strictEqual(response.status, 200);
 
   const arr = response.data as ReadonlyArray<{
     symbol: string;
@@ -146,13 +146,13 @@ async function crawlHuobiFundingRateOneshot(
   market: Market,
   pageIndex = 1,
 ): Promise<readonly FundingRate[]> {
-  assert.equal(market.type, 'Swap');
+  assert.strictEqual(market.type, 'Swap');
 
   const response = await Axios.get(
     `https://api.hbdm.com/swap-api/v1/swap_historical_funding_rate?contract_code=${market.id}&page_index=${pageIndex}&page_size=50`,
   );
-  assert.equal(response.status, 200);
-  assert.equal(response.data.status, 'ok');
+  assert.strictEqual(response.status, 200);
+  assert.strictEqual(response.data.status, 'ok');
 
   const arr = response.data.data.data as ReadonlyArray<{
     funding_rate: string;
@@ -203,15 +203,15 @@ async function crawlBitMEXFundingRateOneshot(
   market: Market,
   startTime = 1568088000000, // '2019-09-10T04:00:00.000Z'
 ): Promise<readonly FundingRate[]> {
-  assert.equal(market.type, 'Swap');
+  assert.strictEqual(market.type, 'Swap');
 
   const response = await Axios.get(
     `https://www.bitmex.com/api/v1/funding?symbol=${
       market.baseId
     }:perpetual&count=500&startTime=${new Date(startTime).toISOString()}`,
   );
-  assert.equal(response.status, 200);
-  assert.equal(response.statusText, 'OK');
+  assert.strictEqual(response.status, 200);
+  assert.strictEqual(response.statusText, 'OK');
 
   const arr = response.data as ReadonlyArray<{
     timestamp: string;
@@ -255,7 +255,7 @@ async function crawlBitMEXFundingRate(
 }
 
 export async function crawlFundingRates(market: Market): Promise<void> {
-  assert.equal(market.type, 'Swap');
+  assert.strictEqual(market.type, 'Swap');
 
   // get startTime
   if (!fs.existsSync(path.join(FUNDING_RATES_DIR, market.exchange))) {
@@ -302,6 +302,8 @@ export async function crawlFundingRates(market: Market): Promise<void> {
     if (tmp instanceof Error) {
       succeeded = false;
       console.error(`${market.exchange}-${market.pair}`);
+      console.error(tmp.message);
+      await new Promise((resolve) => setTimeout(resolve, 5000)); // eslint-disable-line no-await-in-loop
     } else {
       succeeded = true;
       fundingRates = tmp;
