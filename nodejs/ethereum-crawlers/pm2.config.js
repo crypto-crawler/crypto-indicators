@@ -13,6 +13,13 @@ const apps = [
     exec_mode: 'fork',
     instances: 1,
   },
+  {
+    name: 'eth_miner_revenue',
+    script: 'dist/cli.js',
+    args: 'eth_miner_revenue',
+    exec_mode: 'fork',
+    instances: 1,
+  },
 ];
 
 module.exports = {

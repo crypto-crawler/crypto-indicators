@@ -29,3 +29,6 @@
 - pipeline.id: eth_gas_price
   path.config: "/usr/share/logstash/pipeline/eth_gas_price.conf"
   pipeline.workers: 1
+- pipeline.id: eth_miner_revenue
+  path.config: "/usr/share/logstash/pipeline/eth_miner_revenue.conf"
+  pipeline.workers: 1
