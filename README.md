@@ -1,5 +1,7 @@
 # crypto-indicators
 
+**Deprecated: this project is replaced by [coinsignal](https://github.com/soulmachine/coinsignal).**
+
 Calculate all kinds of indicators to assist cryptocurrency trading.
 
 Website: <http://crypto-indicators.org>
